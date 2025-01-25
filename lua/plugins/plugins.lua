@@ -162,6 +162,8 @@ return {
     event = "BufReadPre", -- Load when a file is opened
     config = function()
       require("gitlens").setup({
+        ui = {},
+        disabled_filetypes = {},
         blame = {
           enabled = true,
           virtual_text = true, -- Show Git blame as virtual text
@@ -189,6 +191,88 @@ return {
       -- Keybindings
       vim.api.nvim_set_keymap("n", "<Leader>gb", ":GitLensToggleBlame<CR>", { noremap = true, silent = true })
       vim.api.nvim_set_keymap("n", "<Leader>gh", ":GitLensToggleHunk<CR>", { noremap = true, silent = true })
+    end,
+  },
+
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "leoluz/nvim-dap-go",
+      "theHamsta/nvim-dap-virtual-text",
+    },
+    config = function()
+      local dap = require("dap")
+      local dapgo = require("dap-go")
+
+      -- Setup dap-go
+      dapgo.setup()
+
+      -- Project-specific debug configurations
+      dap.configurations.go = {
+        {
+          name = "Launch main.go",
+          type = "go",
+          request = "launch",
+          mode = "auto",
+          program = vim.fn.getcwd() .. "/main.go",
+          args = { "run" },
+        },
+        {
+          name = "Start Jobs",
+          type = "go",
+          request = "launch",
+          mode = "auto",
+          program = vim.fn.getcwd() .. "/main.go",
+          args = { "start-jobs" },
+        },
+        {
+          name = "Run Migrations",
+          type = "go",
+          request = "launch",
+          mode = "auto",
+          program = vim.fn.getcwd() .. "/main.go",
+          args = { "migrate", "up" },
+        },
+      }
+
+      -- Setup UI
+      require("dapui").setup()
+
+      -- Virtual text for variables
+      require("nvim-dap-virtual-text").setup({
+        enabled = true, -- Show virtual text for variables
+        highlight_changed_variables = true,
+        show_stop_reason = true,
+      })
+
+      -- Automatically open/close UI
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        require("dapui").open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        require("dapui").close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        require("dapui").close()
+      end
+
+      -- 🔥 Keybindings for Debugging
+      vim.api.nvim_set_keymap("n", "<F5>", ":DapContinue<CR>", { noremap = true, silent = true }) -- Start debugging
+      vim.api.nvim_set_keymap("n", "<F10>", ":DapStepOver<CR>", { noremap = true, silent = true }) -- Step over
+      vim.api.nvim_set_keymap("n", "<F11>", ":DapStepInto<CR>", { noremap = true, silent = true }) -- Step into
+      vim.api.nvim_set_keymap("n", "<F12>", ":DapStepOut<CR>", { noremap = true, silent = true }) -- Step out
+      vim.api.nvim_set_keymap("n", "<Leader>b", ":DapToggleBreakpoint<CR>", { noremap = true, silent = true }) -- Toggle breakpoint
+      vim.api.nvim_set_keymap(
+        "n",
+        "<Leader>B",
+        ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
+        { noremap = true, silent = true }
+      ) -- Conditional breakpoint
+      vim.api.nvim_set_keymap("n", "<Leader>dx", ":DapTerminate<CR>", { noremap = true, silent = true }) -- Stop debugging
+
+      -- 🔥 KEYBINDING: Select & Start Debugging
+      vim.api.nvim_set_keymap("n", "<Leader>dc", ":lua require'dap'.continue()<CR>", { noremap = true, silent = true })
     end,
   },
 }
