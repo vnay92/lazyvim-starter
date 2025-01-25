@@ -135,4 +135,60 @@ return {
       },
     },
   },
+
+  -- install minimap. Really cool stuff
+  {
+    "wfxr/minimap.vim",
+    cmd = { "MinimapToggle", "MinimapRefresh", "MinimapClose" },
+    build = "cargo install --locked code-minimap", -- Required for minimap to function
+    config = function()
+      vim.g.minimap_width = 10
+      vim.g.minimap_auto_start = 1 -- Start automatically
+      vim.g.minimap_auto_start_win_enter = 1
+      vim.g.minimap_highlight_range = 1
+      vim.g.minimap_git_colors = 1
+      vim.g.minimap_base_highlight = "Normal"
+      vim.g.minimap_block_filetypes = { "packer", "qf", "help", "nerdtree", "lazy" }
+
+      -- Keybinding for Minimap Toggle
+      vim.api.nvim_set_keymap("n", "<Leader>m", ":MinimapToggle<CR>", { noremap = true, silent = true })
+    end,
+  },
+
+  -- git lens
+  {
+    "cosmicthemethhead/gitlens.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" }, -- Required dependency
+    event = "BufReadPre", -- Load when a file is opened
+    config = function()
+      require("gitlens").setup({
+        blame = {
+          enabled = true,
+          virtual_text = true, -- Show Git blame as virtual text
+          hl_group = "Comment", -- Highlight as comments
+        },
+        hunk = {
+          enabled = true,
+          show_count = true,
+        },
+        current_line_blame = {
+          enabled = true,
+          delay = 500, -- 500ms delay before showing blame
+        },
+        signs = {
+          add = "│",
+          change = "│",
+          delete = "󰍵",
+        },
+        mappings = {
+          toggle_blame = "<Leader>gb",
+          toggle_hunk = "<Leader>gh",
+        },
+      })
+
+      -- Keybindings
+      vim.api.nvim_set_keymap("n", "<Leader>gb", ":GitLensToggleBlame<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<Leader>gh", ":GitLensToggleHunk<CR>", { noremap = true, silent = true })
+    end,
+  },
 }
