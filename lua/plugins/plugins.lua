@@ -140,7 +140,6 @@ return {
   {
     "wfxr/minimap.vim",
     cmd = { "MinimapToggle", "MinimapRefresh", "MinimapClose" },
-    build = "cargo install --locked code-minimap", -- Required for minimap to function
     config = function()
       vim.g.minimap_width = 10
       vim.g.minimap_auto_start = 1 -- Start automatically
