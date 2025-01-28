@@ -161,7 +161,9 @@ return {
     event = "BufReadPre", -- Load when a file is opened
     config = function()
       require("gitlens").setup({
-        ui = {},
+        ui = {
+          logo = "",
+        },
         disabled_filetypes = {},
         blame = {
           enabled = true,
