@@ -217,6 +217,14 @@ return {
           request = "launch",
           mode = "auto",
           program = vim.fn.getcwd() .. "/main.go",
+          args = {},
+        },
+        {
+          name = "Start Server",
+          type = "go",
+          request = "launch",
+          mode = "auto",
+          program = vim.fn.getcwd() .. "/main.go",
           args = { "run" },
         },
         {
